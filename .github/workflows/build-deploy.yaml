@@ -1,0 +1,129 @@
+name: Build and Deploy
+
+on:
+  push:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
+
+permissions:
+  contents: write
+  id-token: write
+  packages: write
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04-arm
+    name: Test
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      
+      - name: Run Tests
+        uses: ./.github/workflows/composite/test
+  
+  check-version:
+    runs-on: ubuntu-24.04-arm
+    name: Check Version
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Check Greater Than latest
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          latest_version=$(gh release view --json tagName -q .tagName || echo "0.0.0")
+          newest_version=$(printf "%s\n%s" "$latest_version" "${{ github.ref_name }}" | sort -V | tail -n1)
+
+          if [[ "${{ github.ref_name }}" != "$newest_version" ]]; then
+            echo "Tag is not newer than the latest release" >> /dev/stderr
+            exit 1
+          fi
+      
+      - name: Check Web Package Version
+        run: |
+          web_version=$(cat web/package.json | jq -r ".version")
+
+          if [[ "${{ github.ref_name }}" != "$web_version" ]]; then
+            echo "Web package version does not match tag" >> /dev/stderr
+            exit 1
+          fi
+      
+      - name: Check Backend Package Version
+        run: |
+          backend_version=$(awk -F' *= *' '
+            $0 ~ /^\[package\]/ { in_package=1; next }
+            in_package && $1 ~ /^version$/ {
+              gsub(/["'\'']/, "", $2); print $2; exit
+            }
+          ' backend/Cargo.toml)
+
+          if [[ "${{ github.ref_name }}" != "$backend_version" ]]; then
+            echo "Backend package version does not match tag" >> /dev/stderr
+            exit 1
+          fi
+
+  build-and-push-amd64:
+    runs-on: ubuntu-latest
+    name: Build and Push for amd64
+    needs:
+      - test
+      - check-version
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      
+      - name: Build and Push
+        uses: ./.github/workflows/composite/build-and-push
+        with:
+          platform: amd64
+
+  build-and-push-arm64:
+    runs-on: ubuntu-24.04-arm
+    name: Build and Push for arm64
+    needs:
+      - test
+      - check-version
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      
+      - name: Build and Push
+        uses: ./.github/workflows/composite/build-and-push
+        with:
+          platform: arm64
+
+  publish:
+    runs-on: ubuntu-24.04-arm
+    name: Publish
+    needs:
+      - build-and-push-amd64
+      - build-and-push-arm64
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Generate Changelog
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          latest_version=$(gh release view --json tagName -q .tagName || echo "")
+          if [[ "$latest_version" == "" ]]; then
+            git log --pretty=format:"%s" > /tmp/changelog.txt
+          else
+            latest_version_commit=$(git rev-parse "$latest_version")
+            git log $latest_version_commit..${{ github.sha }} --pretty=format:"%s" > /tmp/changelog.txt
+          fi
+
+      - name: Publish
+        uses: softprops/action-gh-release@6cbd405e2c4e67a21c47fa9e383d020e4e28b836 # 2.3.3
+        with:
+          body_path: /tmp/changelog.txt
+

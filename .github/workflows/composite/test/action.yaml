@@ -1,0 +1,39 @@
+name: Test
+
+runs:
+  using: composite
+  steps:
+    - name: Install Node
+      shell: bash -euo pipefail {0}
+      run: |
+        curl -fsSL https://fnm.vercel.app/install | bash -s -- --install-dir ~/.fnm --skip-shell
+        echo "$HOME/.fnm" >> $GITHUB_PATH
+        export PATH="$PATH:$HOME/.fnm"
+        eval "$(fnm env)"
+        fnm install --corepack-enabled 22
+
+    - name: Install Cargo
+      shell: bash -euo pipefail {0}
+      run: |
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+    - name: Lint Web
+      shell: bash -euo pipefail {0}
+      run: |
+        cd web
+        eval "$(fnm env)"
+        fnm use 22
+        pnpm install
+        pnpm prettier . --check
+        pnpm eslint .
+        pnpm tsc --project tsconfig.lint.json
+        cd ..
+
+    - name: Lint Backend
+      shell: bash -euo pipefail {0}
+      run: |
+        cd backend
+        cargo fmt --check
+        cargo clippy -- --deny warnings
+        cd ..
