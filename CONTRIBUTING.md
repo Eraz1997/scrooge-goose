@@ -35,15 +35,16 @@
 pnpm dev
 ```
 
-If you run the frontend only, you can access it at `http://localhost:3000/<path>`.
+The frontend service is available at `http://localhost:3000/<path>`.
 
 ### Backend 🎒
 
 ```sh
+docker run --rm -p 5432:5432 --name scrooge-goose-db -e POSTGRES_PASSWORD=postgres postgres
 cargo run
 ```
 
-The backend service is available at `http://localhost:5000/<path>`. Paths starting with `/api` will be forwarded to API handlers, while the others will be forwarded to the frontend server, if any is running.
+The backend service is available at `http://localhost:5000/<path>`. You need to 
 
 ## Lint and Format 🧽
 

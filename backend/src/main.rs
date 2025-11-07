@@ -1,6 +1,6 @@
 use crate::error::Error;
 use crate::logger::Logger;
-use crate::managers::local_http::LocalHttpManager;
+use crate::managers::db::DbManager;
 use crate::server::Server;
 use crate::settings::Settings;
 use axum::Extension;
@@ -11,6 +11,7 @@ use tower_http::cors::CorsLayer;
 use tower_http::trace::TraceLayer;
 
 mod error;
+mod extractors;
 mod logger;
 mod managers;
 mod routes;
@@ -24,13 +25,13 @@ async fn main() -> Result<(), Error> {
 
     Logger::new(&settings).init();
 
-    let local_http_manager = LocalHttpManager::new(&settings)?;
+    let db_manager = DbManager::new(&settings.kiwi_postgres_uri).await?;
 
     let app = create_router(&settings)
         .layer(TraceLayer::new_for_http())
         .layer(DefaultBodyLimit::disable())
-        .layer(CorsLayer::default())
-        .layer(Extension(local_http_manager));
+        .layer(CorsLayer::permissive())
+        .layer(Extension(db_manager));
 
     Server::new(&settings).start(&app).await?;
 
