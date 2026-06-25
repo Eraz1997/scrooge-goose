@@ -8,4 +8,11 @@ impl Error {
             message: "database connection test failed".to_string(),
         }
     }
+
+    pub fn no_rows(model_name: &str) -> Self {
+        Self {
+            code: StatusCode::NOT_FOUND,
+            message: format!("nothing found for {}", model_name),
+        }
+    }
 }

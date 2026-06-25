@@ -4,6 +4,8 @@ use clap::Parser;
 pub struct Settings {
     #[arg(long, default_value = "127.0.0.1")]
     host: String,
+    #[arg(long, env = "KIWI_AUTHORISED_USERS", default_value = "[]")]
+    pub kiwi_authorised_users: String,
     #[arg(
         long,
         env,

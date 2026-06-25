@@ -1,6 +1,7 @@
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use deadpool_postgres::{CreatePoolError, PoolError};
+use reqwest::header::{InvalidHeaderName, InvalidHeaderValue};
 use std::fmt::{Display, Formatter};
 
 #[derive(Debug, Clone)]
@@ -12,6 +13,22 @@ pub struct Error {
 impl Display for Error {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
         write!(formatter, "Error {}: {}", self.code, self.message)
+    }
+}
+
+impl Error {
+    pub fn bad_environment_variable(name: &str, error: impl Display) -> Self {
+        Self {
+            code: StatusCode::INTERNAL_SERVER_ERROR,
+            message: format!("{} is not valid: {}", name, error),
+        }
+    }
+
+    pub fn not_found(object_name: &str) -> Self {
+        Self {
+            code: StatusCode::NOT_FOUND,
+            message: format!("{} not found", object_name),
+        }
     }
 }
 
@@ -76,6 +93,33 @@ impl From<tokio_postgres::Error> for Error {
 
 impl From<refinery::Error> for Error {
     fn from(error: refinery::Error) -> Self {
+        Self {
+            code: StatusCode::INTERNAL_SERVER_ERROR,
+            message: error.to_string(),
+        }
+    }
+}
+
+impl From<serde_json::Error> for Error {
+    fn from(error: serde_json::Error) -> Self {
+        Self {
+            code: StatusCode::INTERNAL_SERVER_ERROR,
+            message: error.to_string(),
+        }
+    }
+}
+
+impl From<InvalidHeaderValue> for Error {
+    fn from(error: InvalidHeaderValue) -> Self {
+        Self {
+            code: StatusCode::INTERNAL_SERVER_ERROR,
+            message: error.to_string(),
+        }
+    }
+}
+
+impl From<InvalidHeaderName> for Error {
+    fn from(error: InvalidHeaderName) -> Self {
         Self {
             code: StatusCode::INTERNAL_SERVER_ERROR,
             message: error.to_string(),
