@@ -1,12 +1,13 @@
 use crate::error::Error;
 use crate::logger::Logger;
 use crate::managers::db::DbManager;
+use crate::middlewares::authentication_middleware;
 use crate::server::Server;
 use crate::settings::Settings;
 use crate::state::AppState;
-use axum::Extension;
 use axum::extract::DefaultBodyLimit;
 use axum::http::{HeaderName, HeaderValue};
+use axum::{Extension, middleware};
 use clap::Parser;
 use reqwest::Method;
 use reqwest::header::{AUTHORIZATION, CONTENT_TYPE};
@@ -18,6 +19,7 @@ mod error;
 mod extractors;
 mod logger;
 mod managers;
+mod middlewares;
 mod routes;
 mod server;
 mod services;
@@ -37,7 +39,6 @@ async fn main() -> Result<(), Error> {
 
     let app_state = AppState {
         authorised_users,
-        storage_path: settings.static_files_path.clone(),
         db: db_manager,
     };
 
@@ -69,6 +70,7 @@ async fn main() -> Result<(), Error> {
         .layer(TraceLayer::new_for_http())
         .layer(DefaultBodyLimit::disable())
         .layer(cors_layer)
+        .layer(middleware::from_fn(authentication_middleware))
         .layer(Extension(app_state));
 
     Server::new(&settings).start(&app).await?;

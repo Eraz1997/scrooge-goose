@@ -30,6 +30,13 @@ impl Error {
             message: format!("{} not found", object_name),
         }
     }
+
+    pub fn unauthorised_user() -> Self {
+        Self {
+            code: StatusCode::UNAUTHORIZED,
+            message: "you are not authorised to access this resource".to_string(),
+        }
+    }
 }
 
 impl std::error::Error for Error {}

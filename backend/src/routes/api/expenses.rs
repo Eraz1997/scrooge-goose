@@ -5,10 +5,7 @@ use axum::{
 };
 use uuid::Uuid;
 
-use crate::{
-    error::Error,
-    managers::db::{DbManager, models::Expense},
-};
+use crate::{error::Error, managers::db::models::Expense, state::AppState};
 
 pub fn create_router() -> Router {
     Router::new()
@@ -19,15 +16,16 @@ pub fn create_router() -> Router {
         .route("/expenses/{id}", delete(delete_expense))
 }
 
-async fn get_expenses(db_manager: Extension<DbManager>) -> Result<Json<Vec<Expense>>, Error> {
-    Ok(Json(db_manager.get_all_expenses().await?))
+async fn get_expenses(state: Extension<AppState>) -> Result<Json<Vec<Expense>>, Error> {
+    Ok(Json(state.db.get_all_expenses().await?))
 }
 
 async fn get_expense(
-    db_manager: Extension<DbManager>,
+    state: Extension<AppState>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<Expense>, Error> {
-    let expense = db_manager
+    let expense = state
+        .db
         .get_expense(&id)
         .await?
         .ok_or(Error::not_found("expense"))?;
@@ -35,22 +33,19 @@ async fn get_expense(
 }
 
 async fn add_expense(
-    db_manager: Extension<DbManager>,
+    state: Extension<AppState>,
     Json(expense): Json<Expense>,
 ) -> Result<(), Error> {
-    db_manager.add_expense(&expense).await
+    state.db.add_expense(&expense).await
 }
 
 async fn edit_expense(
-    db_manager: Extension<DbManager>,
+    state: Extension<AppState>,
     Json(expense): Json<Expense>,
 ) -> Result<(), Error> {
-    db_manager.edit_expense(&expense).await
+    state.db.edit_expense(&expense).await
 }
 
-async fn delete_expense(
-    db_manager: Extension<DbManager>,
-    Path(id): Path<Uuid>,
-) -> Result<(), Error> {
-    db_manager.delete_expense(&id).await
+async fn delete_expense(state: Extension<AppState>, Path(id): Path<Uuid>) -> Result<(), Error> {
+    state.db.delete_expense(&id).await
 }

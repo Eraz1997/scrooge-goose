@@ -4,7 +4,6 @@ use axum::{
 };
 
 pub struct CurrentUser {
-    pub id: i64,
     pub username: String,
 }
 
@@ -15,17 +14,6 @@ where
     type Rejection = (StatusCode, String);
 
     async fn from_request_parts(parts: &mut Parts, _: &State) -> Result<Self, Self::Rejection> {
-        let id = parts
-            .headers
-            .get("X-Kiwi-User-Id")
-            .cloned()
-            .and_then(|header| {
-                header
-                    .to_str()
-                    .ok()
-                    .map(|header_value| header_value.to_string())
-            })
-            .and_then(|header| header.parse::<i64>().ok());
         let username = parts
             .headers
             .get("X-Kiwi-Username")
@@ -37,8 +25,8 @@ where
                     .map(|header_value| header_value.to_string())
             });
 
-        if let (Some(id), Some(username)) = (id, username) {
-            Ok(CurrentUser { id, username })
+        if let Some(username) = username {
+            Ok(CurrentUser { username })
         } else {
             Err((
                 StatusCode::FORBIDDEN,
