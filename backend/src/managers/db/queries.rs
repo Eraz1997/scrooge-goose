@@ -21,8 +21,8 @@ impl DbManager {
                     expenses.category AS category,
                     expenses.created_at AS created_at,
                     COALESCE(
-                        json_agg(
-                            DISTINCT expense_payments(
+                        jsonb_agg(
+                            DISTINCT jsonb_build_object(
                                 'amount_euros', expense_payments.amount_euros,
                                 'borrower_user_name', expense_payments.borrower_user_name
                             )
@@ -31,7 +31,7 @@ impl DbManager {
                     ) AS payments
                 FROM expenses
                 INNER JOIN expense_payments ON expenses.id = expense_payments.expense_id
-                GROUP BY id
+                GROUP BY expenses.id
                 ORDER BY created_at DESC",
             )
             .await?;
@@ -88,8 +88,8 @@ impl DbManager {
                     expenses.category AS category,
                     expenses.created_at AS created_at,
                     COALESCE(
-                        json_agg(
-                            DISTINCT expense_payments(
+                        jsonb_agg(
+                            DISTINCT jsonb_build_object(
                                 'amount_euros', expense_payments.amount_euros,
                                 'borrower_user_name', expense_payments.borrower_user_name
                             )
@@ -99,7 +99,7 @@ impl DbManager {
                 FROM expenses
                 INNER JOIN expense_payments ON expenses.id = expense_payments.expense_id
                 WHERE expenses.id = $1
-                GROUP BY id",
+                GROUP BY expenses.id",
             )
             .await?;
         let row = client.query_opt(&statement, &[&id]).await?;
@@ -117,7 +117,7 @@ impl DbManager {
 
         let statement = transaction
             .prepare_cached(
-                "INSERTO INTO expenses (
+                "INSERT INTO expenses (
                 lender_user_name,
                 title,
                 long_description,
@@ -141,7 +141,7 @@ impl DbManager {
         for payment in expense.payments.iter() {
             let statement = transaction
                 .prepare_cached(
-                    "INSERTO INTO expense_payments (
+                    "INSERT INTO expense_payments (
                     expense_id,
                     amount_euros,
                     borrower_user_name
@@ -171,9 +171,9 @@ impl DbManager {
         let statement = transaction
             .prepare_cached(
                 "UPDATE expenses SET
-                lender_user_name = $1
-                title = $2
-                long_description = $3
+                lender_user_name = $1,
+                title = $2,
+                long_description = $3,
                 category_id = $4
             WHERE id = $5",
             )
@@ -199,7 +199,7 @@ impl DbManager {
         for payment in expense.payments.iter() {
             let statement = transaction
                 .prepare_cached(
-                    "INSERTO INTO expense_payments (
+                    "INSERT INTO expense_payments (
                     expense_id,
                     amount_euros,
                     borrower_user_name
@@ -227,12 +227,12 @@ impl DbManager {
         let transaction = client.transaction().await?;
 
         let statement = transaction
-            .prepare_cached("DELETE FROM expenses WHERE id = $1")
+            .prepare_cached("DELETE FROM expense_payments WHERE expense_id = $1")
             .await?;
         transaction.execute(&statement, &[&id]).await?;
 
         let statement = transaction
-            .prepare_cached("DELETE FROM expense_payments WHERE expense_id = $1")
+            .prepare_cached("DELETE FROM expenses WHERE id = $1")
             .await?;
         transaction.execute(&statement, &[&id]).await?;
 

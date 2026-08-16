@@ -2,6 +2,8 @@ use clap::Parser;
 
 #[derive(Parser, Debug)]
 pub struct Settings {
+    #[arg(long, default_value = "http://localhost:3000")]
+    frontend_development_server_uri: String,
     #[arg(long, default_value = "127.0.0.1")]
     host: String,
     #[arg(long, env = "KIWI_AUTHORISED_USERS", default_value = "[]")]
@@ -27,5 +29,13 @@ impl Settings {
 
     pub fn is_development(&self) -> bool {
         cfg!(debug_assertions)
+    }
+
+    pub fn get_frontend_development_server_uri(&self) -> Option<&str> {
+        if self.is_development() {
+            Some(&self.frontend_development_server_uri)
+        } else {
+            None
+        }
     }
 }

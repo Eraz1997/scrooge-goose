@@ -9,6 +9,7 @@ axum-server = "0.7.2"
 chrono = { version = "0.4.41", features = ["serde"] }
 clap = { version = "4.5.47", features = ["derive", "env"] }
 deadpool-postgres = "0.14.1"
+kangaroo_axum = "0.2.0"
 refinery = { version = "0.9.0", features = ["tokio-postgres"] }
 reqwest = "0.12.23"
 serde = { version = "1.0.228", features = ["derive"] }

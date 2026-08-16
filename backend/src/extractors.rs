@@ -3,17 +3,25 @@ use axum::{
     http::{StatusCode, request::Parts},
 };
 
+use crate::state::AppState;
+
 pub struct CurrentUser {
     pub username: String,
 }
 
-impl<State> FromRequestParts<State> for CurrentUser
-where
-    State: Send + Sync,
-{
+impl FromRequestParts<AppState> for CurrentUser {
     type Rejection = (StatusCode, String);
 
-    async fn from_request_parts(parts: &mut Parts, _: &State) -> Result<Self, Self::Rejection> {
+    async fn from_request_parts(
+        parts: &mut Parts,
+        state: &AppState,
+    ) -> Result<Self, Self::Rejection> {
+        if state.is_development {
+            return Ok(CurrentUser {
+                username: "Dev User".to_string(),
+            });
+        }
+
         let username = parts
             .headers
             .get("X-Kiwi-Username")

@@ -6,11 +6,9 @@ use crate::server::Server;
 use crate::settings::Settings;
 use crate::state::AppState;
 use axum::extract::DefaultBodyLimit;
-use axum::http::{HeaderName, HeaderValue};
-use axum::{Extension, middleware};
+use axum::middleware;
 use clap::Parser;
-use reqwest::Method;
-use reqwest::header::{AUTHORIZATION, CONTENT_TYPE};
+use kangaroo_axum::{KangarooConfig, KangarooRouterExtension};
 use routes::create_router;
 use tower_http::cors::CorsLayer;
 use tower_http::trace::TraceLayer;
@@ -22,7 +20,6 @@ mod managers;
 mod middlewares;
 mod routes;
 mod server;
-mod services;
 mod settings;
 mod state;
 
@@ -40,38 +37,22 @@ async fn main() -> Result<(), Error> {
     let app_state = AppState {
         authorised_users,
         db: db_manager,
+        is_development: settings.is_development(),
     };
 
-    let cors_layer = if settings.is_development() {
-        CorsLayer::new()
-            .allow_origin("http://localhost:3000".parse::<HeaderValue>()?)
-            .allow_credentials(true)
-            .allow_methods([
-                Method::GET,
-                Method::HEAD,
-                Method::OPTIONS,
-                Method::PATCH,
-                Method::POST,
-                Method::PUT,
-                Method::DELETE,
-            ])
-            .allow_private_network(true)
-            .allow_headers([
-                "x-kiwi-user-id".parse::<HeaderName>()?,
-                "x-kiwi-username".parse::<HeaderName>()?,
-                AUTHORIZATION,
-                CONTENT_TYPE,
-            ])
-    } else {
-        CorsLayer::new()
-    };
-
-    let app = create_router(&settings)
+    let app = create_router()
         .layer(TraceLayer::new_for_http())
         .layer(DefaultBodyLimit::disable())
-        .layer(cors_layer)
-        .layer(middleware::from_fn(authentication_middleware))
-        .layer(Extension(app_state));
+        .layer(CorsLayer::new())
+        .layer(middleware::from_fn_with_state(
+            app_state.clone(),
+            authentication_middleware,
+        ))
+        .with_state(app_state)
+        .with_kangaroo(
+            KangarooConfig::new(&settings.static_files_path)
+                .with_frontend_development_server(settings.get_frontend_development_server_uri()),
+        );
 
     Server::new(&settings).start(&app).await?;
 

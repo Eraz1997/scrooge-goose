@@ -1,7 +1,7 @@
-drop table users;
-drop table expenses;
 drop table expense_borrowers;
-drop table category;
+drop table expenses;
+drop table expense_categories;
+drop table users;
 
 create table if not exists expenses (
     id uuid default gen_random_uuid() primary key,

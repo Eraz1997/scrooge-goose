@@ -44,7 +44,7 @@ docker run --rm -p 5432:5432 --name scrooge-goose-db -e POSTGRES_PASSWORD=postgr
 cargo run
 ```
 
-The backend service is available at `http://localhost:5000/<path>`. You need to 
+The backend service is available at `http://localhost:5000/<path>`. It also serves the frontend pages.
 
 ## Lint and Format 🧽
 
@@ -52,7 +52,6 @@ The backend service is available at `http://localhost:5000/<path>`. You need to
 
 ```sh
 pnpm lint
-pnpm format
 ```
 
 ### Backend 🎒

@@ -4,4 +4,5 @@ use crate::managers::db::DbManager;
 pub struct AppState {
     pub authorised_users: Vec<String>,
     pub db: DbManager,
+    pub is_development: bool,
 }

@@ -1,23 +1,19 @@
-import { createBackendClient } from "./hooks/createBackendClient";
-import { Home } from "./pages/home";
-import { NotFound } from "./pages/internal/notFound";
 import { Route, Router } from "@solidjs/router";
-import { Component, onMount } from "solid-js";
-import { Box } from "styled-system/jsx/box";
+import type { Component } from "solid-js";
+import { KangarooProvider } from "./contexts/kangarooContext";
+import { ExpenseView } from "./pages/expense";
+import { Home } from "./pages/home/(home)";
+import { NotFound } from "./pages/internal/notFound";
 
 export const App: Component = () => {
-  const client = createBackendClient();
-
-  onMount(async () => {
-    await client.post("/api/users/self-register");
-  });
-
-  return (
-    <Box class="light">
-      <Router>
-        <Route path="/" component={Home} />
-        <Route path="*404" component={NotFound} />
-      </Router>
-    </Box>
-  );
+	return (
+		<KangarooProvider>
+			<Router>
+				<Route path="/" component={Home} />
+				<Route path="/expenses/new" component={ExpenseView} />
+				<Route path="/expenses/:id" component={ExpenseView} />
+				<Route path="*404" component={NotFound} />
+			</Router>
+		</KangarooProvider>
+	);
 };

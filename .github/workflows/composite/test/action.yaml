@@ -25,9 +25,8 @@ runs:
         eval "$(fnm env)"
         fnm use 22
         pnpm install
-        pnpm prettier . --check
-        pnpm eslint .
-        pnpm tsc --project tsconfig.lint.json
+        pnpm biome check
+        pnpm tsc
         cd ..
 
     - name: Lint Backend

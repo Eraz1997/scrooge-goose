@@ -6,18 +6,21 @@ use uuid::Uuid;
 use crate::error::Error;
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Balance {
     pub user_name: String,
     pub amount_euros: f32,
 }
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ExpensePayement {
     pub amount_euros: f32,
     pub borrower_user_name: String,
 }
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Expense {
     pub id: Uuid,
     pub lender_user_name: String,
