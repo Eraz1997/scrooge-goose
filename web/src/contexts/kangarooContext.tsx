@@ -8,6 +8,8 @@ type HomePayload = {
 
 type ExpensePayload = {
 	expense: Expense;
+	availableUsernames: string[];
+	categories: string[];
 };
 
 type KangarooDataPayload = HomePayload | ExpensePayload;
@@ -49,11 +51,27 @@ export const KangarooProvider = (props: { children: JSX.Element }) => {
 			value={{
 				consumeHomeData: () => {
 					const data = consumeData();
-					return data && "balance" in data ? data : null;
+					return data && "balance" in data
+						? {
+								...data,
+								expenses: data.expenses.map((expense) => {
+									expense.createdAt = new Date(expense.createdAt);
+									return expense;
+								}),
+							}
+						: null;
 				},
 				consumeExpenseData: () => {
 					const data = consumeData();
-					return data && "expense" in data ? data : null;
+					return data && "expense" in data
+						? {
+								...data,
+								expense: {
+									...data.expense,
+									createdAt: new Date(data.expense.createdAt),
+								},
+							}
+						: null;
 				},
 			}}
 		>

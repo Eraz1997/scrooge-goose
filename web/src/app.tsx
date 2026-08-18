@@ -1,7 +1,7 @@
 import { Route, Router } from "@solidjs/router";
 import type { Component } from "solid-js";
 import { KangarooProvider } from "./contexts/kangarooContext";
-import { ExpenseView } from "./pages/expense";
+import { ExpenseView } from "./pages/expense/(expense)";
 import { Home } from "./pages/home/(home)";
 import { NotFound } from "./pages/internal/notFound";
 

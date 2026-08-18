@@ -15,7 +15,9 @@ pub struct Balance {
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ExpensePayement {
+    #[serde(alias = "amount_euros")]
     pub amount_euros: f32,
+    #[serde(alias = "borrower_user_name")]
     pub borrower_user_name: String,
 }
 
@@ -35,8 +37,8 @@ impl TryFrom<Row> for Expense {
     type Error = Error;
 
     fn try_from(value: Row) -> Result<Self, Self::Error> {
-        let payments_serialised = value.try_get::<&str, String>("payments")?;
-        let payments: Vec<ExpensePayement> = serde_json::from_str(&payments_serialised)?;
+        let payments_serialised: serde_json::Value = value.try_get("payments")?;
+        let payments: Vec<ExpensePayement> = serde_json::from_value(payments_serialised)?;
 
         Ok(Self {
             id: value.try_get("id")?,

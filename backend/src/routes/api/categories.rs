@@ -5,7 +5,7 @@ use crate::error::Error;
 use crate::state::AppState;
 
 pub fn create_router() -> Router<AppState> {
-    Router::new().route("/categories", get(get_categories))
+    Router::new().route("/", get(get_categories))
 }
 
 async fn get_categories(state: State<AppState>) -> Result<Json<Vec<String>>, Error> {

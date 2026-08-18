@@ -14,7 +14,7 @@ export const BalanceView: Component<Props> = (props) => {
 	const client = createBackendClient();
 
 	const [balance] = createResourceWithInitialValue<Balance[]>(async () => {
-		const { jsonPayload } = await client.get("/balance");
+		const { jsonPayload } = await client.get("/api/balance");
 		const balance = jsonPayload as Balance[];
 		balance.sort((a, b) => {
 			if (a.userName === b.userName) return 0;

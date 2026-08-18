@@ -1,7 +1,7 @@
 import { useNavigate } from "@solidjs/router";
 import { OrigamiIcon, PlusIcon } from "lucide-solid";
 import type { Component } from "solid-js";
-import { Container, Float, HStack, VStack } from "styled-system/jsx";
+import { Box, Container, Float, HStack, VStack } from "styled-system/jsx";
 import { Heading, IconButton } from "~/components";
 import { useKangaroo } from "~/contexts/kangarooContext";
 import { BalanceView } from "./balance";
@@ -20,7 +20,9 @@ export const Home: Component = () => {
 					<Heading textStyle="4xl">Scooge Goose</Heading>
 				</HStack>
 				<BalanceView balance={kangarooData?.balance} />
-				<ExpensesList expenses={kangarooData?.expenses} />
+				<Box w="full" px="4" overflowX="scroll">
+					<ExpensesList expenses={kangarooData?.expenses} />
+				</Box>
 			</VStack>
 			<Float placement="bottom-end" offset="12">
 				<IconButton size="xl" onClick={() => navigate("/expenses/new")}>

@@ -11,6 +11,15 @@ pub struct HomeData {
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
+pub struct NewExpenseData {
+    pub available_usernames: Vec<String>,
+    pub categories: Vec<String>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ExpenseData {
     pub expense: Expense,
+    pub available_usernames: Vec<String>,
+    pub categories: Vec<String>,
 }

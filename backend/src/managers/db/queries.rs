@@ -51,7 +51,7 @@ impl DbManager {
             .prepare_cached(
                 "SELECT
                     user_name,
-                    SUM(amount_euros) AS amount_euros
+                    SUM(amount_euros)::REAL AS amount_euros
                 FROM (
                     SELECT
                         expenses.lender_user_name AS user_name,
@@ -174,7 +174,7 @@ impl DbManager {
                 lender_user_name = $1,
                 title = $2,
                 long_description = $3,
-                category_id = $4
+                category = $4
             WHERE id = $5",
             )
             .await?;

@@ -5,7 +5,7 @@ use kangaroo_axum::{IntoKangarooError, kangarooise};
 use uuid::Uuid;
 
 use crate::error::Error;
-use crate::routes::models::{ExpenseData, HomeData};
+use crate::routes::models::{ExpenseData, HomeData, NewExpenseData};
 use crate::state::AppState;
 
 mod api;
@@ -28,7 +28,14 @@ async fn get_home(state: State<AppState>) -> Result<HomeData, Error> {
 }
 
 #[kangarooise]
-async fn get_new_expense() {}
+async fn get_new_expense(state: State<AppState>) -> Result<NewExpenseData, Error> {
+    let available_usernames = state.db.get_all_user_names().await?;
+    let categories = state.db.get_all_categories().await?;
+    Ok(NewExpenseData {
+        available_usernames,
+        categories,
+    })
+}
 
 #[kangarooise]
 async fn get_expense(state: State<AppState>, Path(id): Path<Uuid>) -> Result<ExpenseData, Error> {
@@ -37,5 +44,11 @@ async fn get_expense(state: State<AppState>, Path(id): Path<Uuid>) -> Result<Exp
         .get_expense(&id)
         .await?
         .ok_or(Error::not_found("expense"))?;
-    Ok(ExpenseData { expense })
+    let available_usernames = state.db.get_all_user_names().await?;
+    let categories = state.db.get_all_categories().await?;
+    Ok(ExpenseData {
+        expense,
+        available_usernames,
+        categories,
+    })
 }

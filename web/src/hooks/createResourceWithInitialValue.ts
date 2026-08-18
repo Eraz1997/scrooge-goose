@@ -1,4 +1,5 @@
 import {
+	type Accessor,
 	createResource,
 	createSignal,
 	type ResourceFetcher,
@@ -8,10 +9,11 @@ import {
 export const createResourceWithInitialValue = <T>(
 	fetcher: ResourceFetcher<true, T, unknown>,
 	initialValue?: T | undefined,
-): ResourceReturn<T, unknown> => {
+): [...ResourceReturn<T, unknown>, Accessor<Promise<T> | T | null>] => {
 	const [isFetchEnabled, setIsFetchEnabled] = createSignal<boolean>(
 		initialValue === undefined,
 	);
+	const [promise, setPromise] = createSignal<T | Promise<T> | null>(null);
 
 	const kangarooisedFetcher: ResourceFetcher<true, T, unknown> = async (
 		source,
@@ -21,9 +23,13 @@ export const createResourceWithInitialValue = <T>(
 			setIsFetchEnabled(true);
 			return initialValue;
 		} else {
-			return await fetcher(source, info);
+			const fetcherPromise = fetcher(source, info);
+			setPromise(() => fetcherPromise);
+			const result = await fetcherPromise;
+			setPromise(null);
+			return result;
 		}
 	};
 
-	return createResource<T>(kangarooisedFetcher, { initialValue });
+	return [...createResource<T>(kangarooisedFetcher, { initialValue }), promise];
 };

@@ -9,11 +9,11 @@ use crate::{error::Error, managers::db::models::Expense, state::AppState};
 
 pub fn create_router() -> Router<AppState> {
     Router::new()
-        .route("/expenses", get(get_expenses))
-        .route("/expenses/{id}", get(get_expense))
-        .route("/expenses", post(add_expense))
-        .route("/expenses", put(edit_expense))
-        .route("/expenses/{id}", delete(delete_expense))
+        .route("/", get(get_expenses))
+        .route("/{id}", get(get_expense))
+        .route("/", post(add_expense))
+        .route("/", put(edit_expense))
+        .route("/{id}", delete(delete_expense))
 }
 
 async fn get_expenses(state: State<AppState>) -> Result<Json<Vec<Expense>>, Error> {

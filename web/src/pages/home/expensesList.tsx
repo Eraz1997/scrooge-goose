@@ -15,12 +15,16 @@ export const ExpensesList: Component<Props> = (props) => {
 	const navigate = useNavigate();
 
 	const [expenses] = createResourceWithInitialValue<Expense[]>(async () => {
-		const { jsonPayload } = await client.get("/expenses");
-		return jsonPayload;
+		const { jsonPayload } = await client.get("/api/expenses");
+		const expenses: Expense[] = jsonPayload;
+		expenses.forEach((expense) => {
+			expense.createdAt = new Date(expense.createdAt);
+		});
+		return expenses;
 	}, props.expenses);
 
 	return (
-		<Table.Root flexGrow="1">
+		<Table.Root flexGrow="1" minW="2xl">
 			<Table.Head>
 				<Table.Row>
 					<Table.Header>Who paid?</Table.Header>
@@ -39,14 +43,15 @@ export const ExpensesList: Component<Props> = (props) => {
 								{expense.lenderUserName}
 							</Table.Cell>
 							<Table.Cell>{expense.title}</Table.Cell>
-							<Table.Cell>{expense.category}</Table.Cell>
 							<Table.Cell>
-								<Badge>
-									{expense.payments.reduce(
-										(total, payment) => total + payment.amountEuros,
-										0,
-									)}
-								</Badge>
+								{expense.payments.reduce(
+									(total, payment) => total + payment.amountEuros,
+									0,
+								)}{" "}
+								€
+							</Table.Cell>
+							<Table.Cell>
+								<Badge>{expense.category}</Badge>
 							</Table.Cell>
 							<Table.Cell>{expense.createdAt.toDateString()}</Table.Cell>
 							<Table.Cell width="24" textAlign="end">
