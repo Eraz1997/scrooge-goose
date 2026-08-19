@@ -226,7 +226,7 @@ export const ExpenseView: Component = () => {
 													min={0}
 													onValueChange={(event) =>
 														setTotalAmount(
-															event.value ? event.valueAsNumber : 0,
+															event.value ? toSafeNumber(event.value) : 0,
 														)
 													}
 													allowMouseWheel
@@ -269,10 +269,7 @@ export const ExpenseView: Component = () => {
 																	"payments",
 																	index(),
 																	"amountEuros",
-																	event.value
-																		? Math.round(event.valueAsNumber * 100) /
-																				100
-																		: 0,
+																	event.value ? toSafeNumber(event.value) : 0,
 																)
 															}
 															allowMouseWheel
@@ -376,4 +373,9 @@ export const ExpenseView: Component = () => {
 			</Match>
 		</Switch>
 	);
+};
+
+const toSafeNumber = (value: string): number => {
+	const safeValue = Math.round(parseFloat(value.replace(",", ".")) * 100) / 100;
+	return Number.isNaN(safeValue) ? 0 : safeValue;
 };
