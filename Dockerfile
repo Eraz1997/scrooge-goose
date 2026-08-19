@@ -37,7 +37,6 @@ from debian@sha256:c2880112cc5c61e1200c26f106e4123627b49726375eb5846313da9cca117
     ## Runtime Command
 
     cmd /app/bin/scrooge-goose-api \
-        --dev-frontend-server-port 0 \
         --host 0.0.0.0 \
         --log-level info \
         --port 5000 \
