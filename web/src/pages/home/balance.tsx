@@ -24,7 +24,7 @@ export const BalanceView: Component<Props> = (props) => {
 	}, props.balance);
 
 	return (
-		<Card.Root w="full" alignItems="center">
+		<Card.Root w="full" alignItems="center" flexShrink="0">
 			<Card.Body p="6">
 				<HStack gap="8">
 					<For

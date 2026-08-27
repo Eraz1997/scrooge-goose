@@ -14,7 +14,7 @@ export const Home: Component = () => {
 
 	return (
 		<Container p="12" h="100dvh" w={{ base: "2xl", lgDown: "full" }}>
-			<VStack gap="12">
+			<VStack gap="12" h="full">
 				<HStack>
 					<OrigamiIcon size="var(--sizes-12)" />
 					<Heading textStyle="4xl">Scooge Goose</Heading>
