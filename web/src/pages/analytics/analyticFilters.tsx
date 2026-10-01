@@ -2,7 +2,7 @@ import { createListCollection } from "@ark-ui/solid";
 import { CheckIcon, ChevronsUpDownIcon } from "lucide-solid";
 import { type Component, For } from "solid-js";
 import { Portal } from "solid-js/web";
-import { Box, HStack, VStack } from "styled-system/jsx";
+import { HStack, VStack } from "styled-system/jsx";
 import { Select, Text } from "~/components";
 import { NumberedSelectBox } from "./numberedSelectBox";
 import { StringSelectBox } from "./stringSelectBox";
@@ -66,7 +66,8 @@ export const AnalyticFilters: Component<Props> = (props) => {
 					value={props.from.year}
 					setValue={props.setFromYear}
 				/>
-				<Box flex="1" />
+			</HStack>
+			<HStack>
 				<Text textStyle="lg">To: </Text>
 				<NumberedSelectBox
 					from={1}
@@ -128,7 +129,8 @@ export const AnalyticFilters: Component<Props> = (props) => {
 					selectedItems={props.categories}
 					setValues={props.setCategories}
 				/>
-				<Box flex="1" />
+			</HStack>
+			<HStack>
 				<Text textStyle="lg">Users: </Text>
 				<StringSelectBox
 					avaliableItems={props.availableUsers}
