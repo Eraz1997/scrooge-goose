@@ -1,7 +1,7 @@
 ## Dependencies
 
 [tools]
-rust = "latest"
+rust = { version = "latest", components = ["rustfmt", "clippy"] }
 node = "latest"
 pnpm = "latest"
 
