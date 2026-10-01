@@ -5,7 +5,7 @@ use kangaroo_axum::{IntoKangarooError, kangarooise};
 use uuid::Uuid;
 
 use crate::error::Error;
-use crate::routes::models::{ExpenseData, HomeData, NewExpenseData};
+use crate::routes::models::{AnalyticsData, ExpenseData, HomeData, NewExpenseData};
 use crate::state::AppState;
 
 mod api;
@@ -17,6 +17,7 @@ pub fn create_router() -> Router<AppState> {
         .route("/", get(get_home))
         .route("/expenses/new", get(get_new_expense))
         .route("/expenses/{id}", get(get_expense))
+        .route("/analytics", get(get_analytics))
 }
 
 #[kangarooise]
@@ -50,5 +51,14 @@ async fn get_expense(state: State<AppState>, Path(id): Path<Uuid>) -> Result<Exp
         expense,
         available_usernames,
         categories,
+    })
+}
+
+#[kangarooise]
+async fn get_analytics(state: State<AppState>) -> Result<AnalyticsData, Error> {
+    Ok(AnalyticsData {
+        expenses: state.db.get_all_expenses().await?,
+        usernames: state.db.get_all_user_names().await?,
+        categories: state.db.get_all_categories().await?,
     })
 }

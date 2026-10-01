@@ -1,6 +1,7 @@
 import { Route, Router } from "@solidjs/router";
 import type { Component } from "solid-js";
 import { KangarooProvider } from "./contexts/kangarooContext";
+import { Analytics } from "./pages/analytics/(analytics)";
 import { ExpenseView } from "./pages/expense/(expense)";
 import { Home } from "./pages/home/(home)";
 import { NotFound } from "./pages/internal/notFound";
@@ -12,6 +13,7 @@ export const App: Component = () => {
 				<Route path="/" component={Home} />
 				<Route path="/expenses/new" component={ExpenseView} />
 				<Route path="/expenses/:id" component={ExpenseView} />
+				<Route path="/analytics" component={Analytics} />
 				<Route path="*404" component={NotFound} />
 			</Router>
 		</KangarooProvider>

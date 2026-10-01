@@ -8,55 +8,30 @@
 
 ## Setup 🪛
 
-### Web 🕷️
+Install [mise](https://mise.jdx.dev/) and [Docker](https://docs.docker.com/engine/install/), then install local development tools and dependencies:
 
-1. Install `fnm` ([guide](https://github.com/Schniz/fnm))
-
-1. Install the latest Node.js version:
-
-   ```sh
-   fnm install --latest --corepack-enabled
-   fnm use <INSTALLED_VERSION>
-   ```
-
-1. Install dependencies with `pnpm install`
-
-### Backend 🎒
-
-1. Install Docker ([guide](https://docs.docker.com/engine/install/))
-
-1. [Install Rust](https://www.rust-lang.org/tools/install)
-
-## Run Locally 🧸
-
-### Web 🕷️
-
-```sh
-pnpm dev
+```shell
+mise trust
+mise install
+mise run setup
 ```
 
-The frontend service is available at `http://localhost:3000/<path>`.
+## Run 🧸
 
-### Backend 🎒
+You can start the backend and the frontend altogether. The application will be fully served by the backend at `http://localhost:5000`, proxying the frontend as well.
 
-```sh
-docker run --rm -p 5432:5432 --name scrooge-goose-db -e POSTGRES_PASSWORD=postgres postgres
-cargo run
+```shell
+mise run dev
 ```
 
-The backend service is available at `http://localhost:5000/<path>`. It also serves the frontend pages.
+Similarly, you can format and lint all components:
 
-## Lint and Format 🧽
-
-### Web 🕷️
-
-```sh
-pnpm lint
+```shell
+mise run lint
 ```
 
-### Backend 🎒
+For component-specific operations and other commands, use `mise tasks` to get a list. You can also `cd` into component directories and use bare tool-chain commands.
 
-```sh
-cargo fmt
-cargo clippy -- --deny warnings
-```
+## Release 🚀
+
+Update web and backend package versions and push a new tag `X.Y.Z`, the CI will build and release a new version of the bundle.

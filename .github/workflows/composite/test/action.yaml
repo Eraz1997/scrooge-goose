@@ -3,36 +3,13 @@ name: Test
 runs:
   using: composite
   steps:
-    - name: Install Node
-      shell: bash -euo pipefail {0}
-      run: |
-        curl -fsSL https://fnm.vercel.app/install | bash -s -- --install-dir ~/.fnm --skip-shell
-        echo "$HOME/.fnm" >> $GITHUB_PATH
-        export PATH="$PATH:$HOME/.fnm"
-        eval "$(fnm env)"
-        fnm install --corepack-enabled 22
+    - name: Setup Mise
+      uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
 
-    - name: Install Cargo
+    - name: Install Dependencies
       shell: bash -euo pipefail {0}
-      run: |
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+      run: mise run setup
 
-    - name: Lint Web
+    - name: Lint
       shell: bash -euo pipefail {0}
-      run: |
-        cd web
-        eval "$(fnm env)"
-        fnm use 22
-        pnpm install
-        pnpm biome check
-        pnpm tsc
-        cd ..
-
-    - name: Lint Backend
-      shell: bash -euo pipefail {0}
-      run: |
-        cd backend
-        cargo fmt --check
-        cargo clippy -- --deny warnings
-        cd ..
+      run: mise run lint:check

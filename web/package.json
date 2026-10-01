@@ -1,11 +1,9 @@
 {
 	"name": "scrooge-goose-web",
-	"version": "0.1.3",
+	"version": "0.2.0",
 	"description": "",
 	"type": "module",
 	"scripts": {
-		"dev": "vite --port 3000",
-		"lint": "biome check --write && tsc",
 		"prepare": "panda codegen"
 	},
 	"license": "MIT",
@@ -22,7 +20,9 @@
 	"dependencies": {
 		"@ark-ui/solid": "^5.38.1",
 		"@solidjs/router": "^1.0.0",
+		"date-fns": "^4.4.0",
 		"lucide-solid": "^1.31.0",
+		"solid-charts": "^0.0.2",
 		"solid-js": "^1.9.14"
 	},
 	"packageManager": "pnpm@10.8.0+sha512.0e82714d1b5b43c74610193cb20734897c1d00de89d0e18420aebc5977fa13d780a9cb05734624e81ebd81cc876cd464794850641c48b9544326b5622ca29971"

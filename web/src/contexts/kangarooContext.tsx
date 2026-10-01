@@ -12,11 +12,18 @@ type ExpensePayload = {
 	categories: string[];
 };
 
-type KangarooDataPayload = HomePayload | ExpensePayload;
+type AnalyticsPayload = {
+	expenses: Expense[];
+	usernames: string[];
+	categories: string[];
+};
+
+type KangarooDataPayload = HomePayload | ExpensePayload | AnalyticsPayload;
 
 type KangarooData = {
 	consumeHomeData: () => HomePayload | null;
 	consumeExpenseData: () => ExpensePayload | null;
+	consumeAnalyticsData: () => AnalyticsPayload | null;
 };
 
 const KangarooContext = createContext<KangarooData | undefined>();
@@ -70,6 +77,18 @@ export const KangarooProvider = (props: { children: JSX.Element }) => {
 									...data.expense,
 									createdAt: new Date(data.expense.createdAt),
 								},
+							}
+						: null;
+				},
+				consumeAnalyticsData: () => {
+					const data = consumeData();
+					return data && !("balance" in data) && "expenses" in data
+						? {
+								...data,
+								expenses: data.expenses.map((expense) => {
+									expense.createdAt = new Date(expense.createdAt);
+									return expense;
+								}),
 							}
 						: null;
 				},

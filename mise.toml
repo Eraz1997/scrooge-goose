@@ -1,0 +1,59 @@
+## Dependencies
+
+[tools]
+rust = "latest"
+node = "latest"
+pnpm = "latest"
+
+## Global Tasks
+
+[tasks."setup"]
+run = { tasks = [ "backend:setup", "web:setup" ] }
+
+[tasks."dev"]
+run = { tasks = [ "backend:db", "backend:dev", "web:dev" ] }
+
+[tasks."lint"]
+run = { tasks = [ "backend:lint", "web:lint" ] }
+
+[tasks."lint:check"]
+run = { tasks = [ "backend:lint:check", "web:lint:check" ] }
+
+## Backend Tasks
+
+[tasks."backend:setup"]
+dir = "backend"
+run = "cargo fetch --locked"
+
+[tasks."backend:db"]
+run = "docker run --rm -p 5432:5432 --name scrooge-goose-db -e POSTGRES_PASSWORD=postgres postgres"
+
+[tasks."backend:dev"]
+dir = "backend"
+run = "cargo run"
+
+[tasks."backend:lint"]
+dir = "backend"
+run = [ "cargo fmt", "cargo clippy -- --deny warnings" ]
+
+[tasks."backend:lint:check"]
+dir = "backend"
+run = [ "cargo fmt --check", "cargo clippy -- --deny warnings" ]
+
+## Web Tasks
+
+[tasks."web:setup"]
+dir = "web"
+run = "pnpm install --frozen-lockfile"
+
+[tasks."web:dev"]
+dir = "web"
+run = "pnpm vite --host 0.0.0.0 --port 3000"
+
+[tasks."web:lint"]
+dir = "web"
+run = [ "pnpm biome check --write", "pnpm tsc" ]
+
+[tasks."web:lint:check"]
+dir = "web"
+run = [ "pnpm biome check", "pnpm tsc" ]

@@ -1,6 +1,7 @@
 import { createListCollection } from "@ark-ui/solid";
 import { CheckIcon, ChevronsUpDownIcon } from "lucide-solid";
 import { type Component, createSignal, For, Match, Switch } from "solid-js";
+import { Portal } from "solid-js/web";
 import { HStack } from "styled-system/jsx";
 import { Checkbox, Field, Select } from "~/components";
 import { createBackendClient } from "~/hooks/createBackendClient";
@@ -72,20 +73,22 @@ export const CustomSelector: Component<Props> = (props) => {
 									<ChevronsUpDownIcon />
 								</Select.Trigger>
 							</Select.Control>
-							<Select.Positioner>
-								<Select.Content>
-									<For each={collection().items}>
-										{(item) => (
-											<Select.Item item={item}>
-												<Select.ItemText>{item}</Select.ItemText>
-												<Select.ItemIndicator>
-													<CheckIcon />
-												</Select.ItemIndicator>
-											</Select.Item>
-										)}
-									</For>
-								</Select.Content>
-							</Select.Positioner>
+							<Portal>
+								<Select.Positioner>
+									<Select.Content maxH="96" overflowY="scroll">
+										<For each={collection().items}>
+											{(item) => (
+												<Select.Item item={item}>
+													<Select.ItemText>{item}</Select.ItemText>
+													<Select.ItemIndicator>
+														<CheckIcon />
+													</Select.ItemIndicator>
+												</Select.Item>
+											)}
+										</For>
+									</Select.Content>
+								</Select.Positioner>
+							</Portal>
 						</Select.Root>
 					</Match>
 				</Switch>

@@ -23,3 +23,11 @@ pub struct ExpenseData {
     pub available_usernames: Vec<String>,
     pub categories: Vec<String>,
 }
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AnalyticsData {
+    pub expenses: Vec<Expense>,
+    pub usernames: Vec<String>,
+    pub categories: Vec<String>,
+}

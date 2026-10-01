@@ -1,5 +1,5 @@
 import { useNavigate } from "@solidjs/router";
-import { OrigamiIcon, PlusIcon } from "lucide-solid";
+import { ChartSplineIcon, OrigamiIcon, PlusIcon } from "lucide-solid";
 import type { Component } from "solid-js";
 import { Box, Container, Float, HStack, VStack } from "styled-system/jsx";
 import { Heading, IconButton } from "~/components";
@@ -25,9 +25,14 @@ export const Home: Component = () => {
 				</Box>
 			</VStack>
 			<Float placement="bottom-end" offset="12">
-				<IconButton size="xl" onClick={() => navigate("/expenses/new")}>
-					<PlusIcon />
-				</IconButton>
+				<HStack>
+					<IconButton size="xl" onClick={() => navigate("/expenses/new")}>
+						<PlusIcon />
+					</IconButton>
+					<IconButton size="xl" onClick={() => navigate("/analytics")}>
+						<ChartSplineIcon />
+					</IconButton>
+				</HStack>
 			</Float>
 		</Container>
 	);
