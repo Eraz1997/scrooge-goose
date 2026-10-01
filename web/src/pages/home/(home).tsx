@@ -24,7 +24,7 @@ export const Home: Component = () => {
 					<ExpensesList expenses={kangarooData?.expenses} />
 				</Box>
 			</VStack>
-			<Float placement="bottom-end" offset="12">
+			<Float placement="bottom-end" offsetY="12" offsetX="16">
 				<HStack>
 					<IconButton size="xl" onClick={() => navigate("/expenses/new")}>
 						<PlusIcon />

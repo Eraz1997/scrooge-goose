@@ -325,24 +325,10 @@ export const ExpenseView: Component = () => {
 										</Text>
 									</VStack>
 
-									<HStack>
+									<HStack flexWrap="wrap" justifyContent="center">
 										<Button variant="subtle" onClick={() => navigate("/")}>
 											Cancel
 										</Button>
-										<Show when={!isNewExpense()}>
-											<Button
-												bgColor={{ base: "red.7", _hover: "red.8" }}
-												onClick={async () => {
-													await client.delete(
-														`/api/expenses/${safeExpense().id}`,
-													);
-													navigate("/");
-												}}
-											>
-												Delete Expense
-												<FlameKindlingIcon />
-											</Button>
-										</Show>
 										<Button
 											onClick={async () => {
 												const action = isNewExpense()
@@ -378,6 +364,20 @@ export const ExpenseView: Component = () => {
 												<SproutIcon />
 											</Show>
 										</Button>
+										<Show when={!isNewExpense()}>
+											<Button
+												bgColor={{ base: "red.7", _hover: "red.8" }}
+												onClick={async () => {
+													await client.delete(
+														`/api/expenses/${safeExpense().id}`,
+													);
+													navigate("/");
+												}}
+											>
+												Delete Expense
+												<FlameKindlingIcon />
+											</Button>
+										</Show>
 									</HStack>
 								</VStack>
 							</Card.Body>

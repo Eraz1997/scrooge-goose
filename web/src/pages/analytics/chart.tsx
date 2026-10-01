@@ -104,10 +104,8 @@ export const AnalyticsChart: Component<Props> = (props) => {
 					{(category) => (
 						<Bar
 							dataKey={category}
-							stackId={category}
+							stackId="singleStack"
 							fill={categoryToColour(category)}
-							stroke="var(--colors-border-muted)"
-							stroke-width="4px"
 						/>
 					)}
 				</For>
@@ -121,7 +119,9 @@ export const AnalyticsChart: Component<Props> = (props) => {
 					<AxisTooltip
 						class={css({
 							borderRadius: "md",
-							overflow: "hidden",
+							overflow: "scroll",
+							pointerEvents: "visible !important",
+							maxH: "48",
 							boxShadow: "lg",
 							borderWidth: "1px",
 							borderStyle: "solid",
@@ -138,6 +138,7 @@ export const AnalyticsChart: Component<Props> = (props) => {
 									borderBottomColor="border.muted"
 									pb="2"
 									mb="2"
+									overflowY="visible"
 								>
 									<Text textStyle="lg">{itemProps.data?.xAxis}</Text>
 								</Box>
@@ -169,16 +170,14 @@ export const AnalyticsChart: Component<Props> = (props) => {
 };
 
 const categoryToColour = (category: string): string => {
-	const hash = category
-		.split("")
-		.reduce(
-			(hash, char, index) => hash + char.charCodeAt(0) * (index + 1) ** 8,
-			0,
-		)
-		.toString(16);
-	if (hash.length >= 6) {
-		return `#${hash.substring(0, 6)}`;
-	} else {
-		return `#${hash}${hash}${hash}${hash}${hash}${hash}`.substring(0, 7);
-	}
+	const hash =
+		(category
+			.split("")
+			.reduce(
+				(hash, char, index) => hash + char.charCodeAt(0) * (index + 1) ** 8,
+				0,
+			) %
+			12) +
+		1;
+	return `var(--colors-indigo-${hash})`;
 };
